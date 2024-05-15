@@ -75,10 +75,10 @@ namespace ImNoMasochist
             }
         }
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(ShieldGenerator))]
+        [HarmonyPatch(typeof(ShieldGenerator), "UpdateShield")]
         public static void ShieldGenerator_UpdateShield(ref string ___m_name, ref int ___m_maxFuel)
         {
-            if (___m_name.Contains("Shield"))
+            if (___m_name.Contains("shield"))
             {
                 ___m_maxFuel = Plugin.Shield_MaxFuel.Value;
             }

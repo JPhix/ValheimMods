@@ -12,7 +12,7 @@ namespace ImNoMasochist
     {
         public const string Name = "ImNoMasochist";
         public const string Guid = "Xenofell." + Name;
-        public const string Version = "0.2";
+        public const string Version = "0.3";
     }
 
     [BepInPlugin(PluginInfo.Guid, PluginInfo.Name, PluginInfo.Version)]
@@ -22,6 +22,8 @@ namespace ImNoMasochist
         public static ConfigEntry<int> Smelter_MaxFuel;
         public static ConfigEntry<int> Smelter_MaxOre;
         public static ConfigEntry<int> Kiln_MaxFuel;
+        public static ConfigEntry<int> Shield_MaxFuel;
+        public static ConfigEntry<int> Windmill_MaxBarley;
         public static ConfigEntry<float> SecondsPerComfortLevel;
         public static ConfigEntry<float> PieceComfortDistance;
         public static ConfigEntry<float> WagonWeightModifier;
@@ -32,6 +34,8 @@ namespace ImNoMasochist
             Smelter_MaxFuel = Config.Bind("ImNoMasochist", "Smelter_MaxFuel", 200, "Changes the max wood the smelter/blast furnace can hold. (Valheim default is 20)");
             Smelter_MaxOre = Config.Bind("ImNoMasochist", "Smelter_MaxOre", 100, "Changes the max ore the smelter/blast furnace can hold. (Valheim default is 10)");
             Kiln_MaxFuel = Config.Bind("ImNoMasochist", "Kiln_MaxFuel", 200, "Changes the max wood the kiln can hold. (Valheim default is 25)");
+            Shield_MaxFuel = Config.Bind("ImNoMasochist", "Shield_MaxFuel", 250, "Changes the max Bones the Shield can hold. (Valheim default is 10)");
+            Windmill_MaxBarley = Config.Bind("ImNoMasochist", "Windmill_MaxBarley", 100, "Changes the max Barley Windmill can hold. (Valheim default is 50");
             SecondsPerComfortLevel = Config.Bind("ImNoMasochist", "SecondsPerComfortLevel", 180.0f, "Changes the rested length per comfort level. (Valheim default is 60.0)");
             PieceComfortDistance = Config.Bind("ImNoMasochist", "PieceComfortDistance", 20.0f, "Changes how close you msut be to a piece to gain its comfort. (Valheim default is 10.0)");
             WagonWeightModifier = Config.Bind("ImNoMasochist", "WagonWeightModifier", 0.2f, "Changes how heavy the wagon believes it is, leading to changed maneuverability. (Valheim default is 1.0)");
@@ -56,7 +60,7 @@ namespace ImNoMasochist
         [HarmonyPatch(typeof(Smelter), "UpdateSmelter")]
         public static void Smelter_UpdateSmelter(ref string ___m_name, ref int ___m_maxFuel, ref int ___m_maxOre)
         {
-            if (___m_name.Contains("smelter") || ___m_name.Contains("furnace"))
+            if (___m_name.Contains("smelter") || ___m_name.Contains("furnace") || ___m_name.Contains("eitr"))
             {
                 ___m_maxFuel = Plugin.Smelter_MaxFuel.Value;
                 ___m_maxOre = Plugin.Smelter_MaxOre.Value;
@@ -64,6 +68,19 @@ namespace ImNoMasochist
             else if (___m_name.Contains("kiln"))
             {
                 ___m_maxOre = Plugin.Kiln_MaxFuel.Value;
+            }
+            else if (___m_name.Contains("windmill") || ___m_name.Contains("wheel"))
+            {
+                ___m_maxOre = Plugin.Windmill_MaxBarley.Value;
+            }
+        }
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(ShieldGenerator))]
+        public static void ShieldGenerator_UpdateShield(ref string ___m_name, ref int ___m_maxFuel)
+        {
+            if (___m_name.Contains("Shield"))
+            {
+                ___m_maxFuel = Plugin.Shield_MaxFuel.Value;
             }
         }
 

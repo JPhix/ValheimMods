@@ -2,6 +2,7 @@
 using HarmonyLib;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -11,7 +12,7 @@ namespace PreWorkout
     {
         public const string Name = "PreWorkout";
         public const string Guid = "Xenofell." + Name;
-        public const string Version = "0.2";
+        public const string Version = "0.3";
     }
 
     [BepInPlugin(PluginInfo.Guid, PluginInfo.Name, PluginInfo.Version)]
@@ -29,11 +30,13 @@ namespace PreWorkout
     {
         private static FieldInfo field_Food_m_health = AccessTools.Field(typeof(Player.Food), "m_health");
         private static FieldInfo field_Food_m_stamina = AccessTools.Field(typeof(Player.Food), "m_stamina");
+        private static FieldInfo field_Food_m_eitr = AccessTools.Field(typeof(Player.Food), "m_eitr");
 
         private static FieldInfo field_Food_m_item = AccessTools.Field(typeof(Player.Food), "m_item");
         private static FieldInfo field_ItemData_m_shared = AccessTools.Field(typeof(ItemDrop.ItemData), "m_shared");
         private static FieldInfo field_SharedData_m_food = AccessTools.Field(typeof(ItemDrop.ItemData.SharedData), "m_food");
         private static FieldInfo field_SharedData_m_foodStamina = AccessTools.Field(typeof(ItemDrop.ItemData.SharedData), "m_foodStamina");
+        private static FieldInfo field_SharedData_m_foodEitr = AccessTools.Field(typeof(ItemDrop.ItemData.SharedData), "m_foodEitr");
 
         [HarmonyTranspiler]
         [HarmonyPatch(typeof(Player), "GetTotalFoodValue")]
@@ -54,6 +57,12 @@ namespace PreWorkout
                     il[i].operand = field_Food_m_item;
                     il.Insert(++i, new CodeInstruction(OpCodes.Ldfld, field_ItemData_m_shared));
                     il.Insert(++i, new CodeInstruction(OpCodes.Ldfld, field_SharedData_m_foodStamina));
+                }
+                else if (il[i].LoadsField(field_Food_m_eitr))
+                {
+                    il[i].operand = field_Food_m_item;
+                    il.Insert(++i, new CodeInstruction(OpCodes.Ldfld, field_ItemData_m_shared));
+                    il.Insert(++i, new CodeInstruction(OpCodes.Ldfld, field_SharedData_m_foodEitr));
                 }
             }
 
